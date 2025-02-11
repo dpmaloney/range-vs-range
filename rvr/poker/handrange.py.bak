@@ -156,7 +156,6 @@ def _order_option(o):
     s1 = SUIT_MAP[m1[1]]
     s2 = SUIT_MAP[m2[1]]
     sc = cmp(s1, s2)
-    #print(sc, s1, s2)
     if sc < 0:
         return [m2, m1]
     if sc > 0:
@@ -188,7 +187,7 @@ def _odds_and_evens(mnemonics):
     # now we convert the true evens to evens, and leave the odds
     odds = []
     evens = []
-    for key, value in list(potential.items()):
+    for key, value in potential.items():
         if len(key) == 2:
             include = (len(value) == 6)
         elif key[2] == "s":
@@ -510,7 +509,7 @@ def deal_from_ranges(range_map, board):
     """
     count = 0
     while True:
-        result = {k: r.generate_hand(board) for k, r in list(range_map.items())}
+        result = {k: r.generate_hand(board) for k, r in range_map.items()}
         all_cards = [card for hand in list(result.values()) for card in hand]
         all_cards.extend(board)
         if len(all_cards) == len(set(all_cards)):

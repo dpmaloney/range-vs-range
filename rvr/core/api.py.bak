@@ -1513,7 +1513,7 @@ class API(object):
         for data in list(userid_to_data.values()):
             data.sort(key=lambda ev: ev[1])
         return [(user, userid_to_data[userid])
-                for userid, user in list(userid_to_user.items())]
+                for userid, user in userid_to_user.items()]
 
     def _run_pending_analysis(self, gameid=None, debug_combo=""):
         """

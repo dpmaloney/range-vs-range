@@ -1,10 +1,6 @@
 """
 The main pages for the site
 """
-from __future__ import division
-from builtins import range
-from past.utils import old_div
-from builtins import object
 from flask import render_template, redirect
 from rvr.app import APP
 from flask.helpers import flash, url_for
@@ -438,10 +434,10 @@ def range_editor_get():
     color_maker = ColorMaker(opt_ori=opt_ori, opt_una=opt_una, opt_fol=opt_fol,
                              opt_pas=opt_pas, opt_agg=opt_agg)
     if len(opt_ori) != 0:
-        pct_unassigned = old_div(100.0 * len(opt_una), len(opt_ori))
-        pct_fold = old_div(100.0 * len(opt_fol), len(opt_ori))
-        pct_passive = old_div(100.0 * len(opt_pas), len(opt_ori))
-        pct_aggressive = old_div(100.0 * len(opt_agg), len(opt_ori))
+        pct_unassigned = 100.0 * len(opt_una) / len(opt_ori)
+        pct_fold = 100.0 * len(opt_fol) / len(opt_ori)
+        pct_passive = 100.0 * len(opt_pas) / len(opt_ori)
+        pct_aggressive = 100.0 * len(opt_agg) / len(opt_ori)
     else:
         pct_unassigned = pct_fold = pct_passive = pct_aggressive = 0.0
     rank_table = make_rank_table(color_maker, board, can_check=can_check,
@@ -533,10 +529,10 @@ def range_editor_post():
     color_maker = ColorMaker(opt_ori=opt_ori, opt_una=opt_una, opt_fol=opt_fol,
                              opt_pas=opt_pas, opt_agg=opt_agg)
     if len(opt_ori) != 0:
-        pct_unassigned = old_div(100.0 * len(opt_una), len(opt_ori))
-        pct_fold = old_div(100.0 * len(opt_fol), len(opt_ori))
-        pct_passive = old_div(100.0 * len(opt_pas), len(opt_ori))
-        pct_aggressive = old_div(100.0 * len(opt_agg), len(opt_ori))
+        pct_unassigned = 100.0 * len(opt_una) / len(opt_ori)
+        pct_fold = 100.0 * len(opt_fol) / len(opt_ori)
+        pct_passive = 100.0 * len(opt_pas) / len(opt_ori)
+        pct_aggressive = 100.0 * len(opt_agg) / len(opt_ori)
     else:
         pct_unassigned = pct_fold = pct_passive = pct_aggressive = 0.0
     rank_table = make_rank_table(color_maker, board, can_check=can_check,
@@ -629,7 +625,7 @@ def make_ev_rank_table(ev_by_combo):
     """
     Details for appropriate display of an EV rank table
     """
-    combos = list(ev_by_combo.keys())
+    combos = ev_by_combo.keys()
     return [[{'text': rank_text(row, col),
               'id': rank_id(row, col),
               'class': ev_class(combos, ev_by_combo, row, col),

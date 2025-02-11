@@ -1,8 +1,6 @@
 """
 For sending email to users, like telling them it's their turn to act in a game.
 """
-from builtins import str
-from builtins import object
 from flask_mail import Message
 from flask.templating import render_template
 from flask import copy_current_request_context

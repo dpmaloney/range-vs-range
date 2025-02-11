@@ -2,10 +2,6 @@
 Rank, Suit, Card classes and associated functionality
 """
 from __future__ import print_function
-from past.builtins import cmp
-from builtins import str
-from builtins import range
-from builtins import object
 import random
 import operator
 # pylint:disable=R0903
@@ -34,8 +30,6 @@ class Rank(object):
     def __cmp__(self, other):
         return cmp(RANKS_LOW_TO_HIGH.index(self),
                    RANKS_LOW_TO_HIGH.index(other))
-    def __lt__(self, other):
-        return self.__cmp__(other) < 0
     def __hash__(self):
         return hash(self.singular)
     @classmethod
@@ -63,9 +57,6 @@ class Suit(object):
     def __cmp__(self, other):
         return cmp(SUITE_LOW_TO_HIGH.index(self),
                    SUITE_LOW_TO_HIGH.index(other))
-    
-    def __lt__(self, other):
-        return self.__cmp__(other) < 0
     def __hash__(self):
         return hash(self.text)
     @classmethod
@@ -117,7 +108,7 @@ RANK_MAP = {
     "2": DEUCE
     }
 
-RANK_INVERT = {v:k for k, v in list(RANK_MAP.items())}
+RANK_INVERT = {v:k for k, v in RANK_MAP.items()}
 
 SUIT_MAP = {
     "s": SPADES,
@@ -126,7 +117,7 @@ SUIT_MAP = {
     "c": CLUBS
     }
 
-SUIT_INVERT = {v:k for k, v in list(SUIT_MAP.items())}
+SUIT_INVERT = {v:k for k, v in SUIT_MAP.items()}
 
 RANK_FOR_MASK = {
     ACE: 12,

@@ -707,7 +707,7 @@ def write_db(data):
         raise Exception("dumpable_tables inconsistent with TABLE_WRITERS")
     session = SESSION()
     for table in dumpable_tables:
-        if table.__tablename__ in data:
+        if data.has_key(table.__tablename__):
             logging.debug("writing %s", table.__tablename__)
             TABLE_WRITERS[table](session, data[table.__tablename__])
 

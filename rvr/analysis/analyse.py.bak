@@ -60,10 +60,10 @@ def _calculate_weights(combo, range_action, others_ranges, board):
         villain_a = HandRange(range_action.aggressive_range)  \
             .generate_options(board)
         others_options = {k: HandRange(v).generate_options(board)
-                          for k, v in list(others_ranges.items())}
+                          for k, v in others_ranges.items()}
         for _ in range(1000 * len(others_ranges)):
             dealt = {None: combo}  # None for Hero
-            for player, options in list(others_options.items()):
+            for player, options in others_options.items():
                 dealt[player] = random.choice(options)
             if _impossible_deal(list(dealt.values())):
                 continue
@@ -206,7 +206,7 @@ def _merge_non_actor_ev(session, board, ranges, games, range_action,
         logging.debug('populating non-actor (userid %d) EV for %d combos',
                       hero, len(options))
         for combo in options:
-            others_ranges = {k: v for k, v in list(ranges.items())
+            others_ranges = {k: v for k, v in ranges.items()
                              if k != hero}
             result = _calculate_weights(combo, range_action, others_ranges,
                                         board)
@@ -744,12 +744,12 @@ class AnalysisReplayer(object):
         else:
             # we must simulate
             players_options = {k: HandRange(v).generate_options(board)
-                               for k, v in list(ranges.items())}
+                               for k, v in ranges.items()}
             total = 0
             wins = 0.0
             for _i in range(1000 * len(ranges)):
                 dealt = {None: combo}  # showdown requires a key, we'll use None
-                for player, options in list(players_options.items()):
+                for player, options in players_options.items():
                     dealt[player] = random.choice(options)
                 if _impossible_deal(list(dealt.values())):
                     continue
@@ -811,7 +811,7 @@ class AnalysisReplayer(object):
             # this is the only scenario where a combos gets multiple showdowns
             # we must simulate
             players_options = {k: HandRange(v).generate_options(board)
-                               for k, v in list(ranges.items())}
+                               for k, v in ranges.items()}
             last_f = HandRange(item.fold_range).generate_options(board)
             last_p = HandRange(item.passive_range).generate_options(board)
             last_a = HandRange(item.aggressive_range).generate_options(board)
@@ -823,7 +823,7 @@ class AnalysisReplayer(object):
                 # deal to decide if it's the first showdown (because last player
                 # folds) or the second showdown (because last player calls), or
                 # no showdown (because they raise).
-                for player, options in list(players_options.items()):
+                for player, options in players_options.items():
                     dealt[player] = random.choice(options)
                 if _impossible_deal(list(dealt.values())):
                     continue
@@ -866,7 +866,7 @@ class AnalysisReplayer(object):
                           fold_order, call_order, userid, fold_order,
                           call_order, ranges, item.fold_range,
                           item.passive_range, item.aggressive_range)
-        other_ranges = {k: v for k, v in list(ranges.items()) if k != userid}
+        other_ranges = {k: v for k, v in ranges.items() if k != userid}
         combos = HandRange(ranges[userid]).generate_options(board)
         for combo in combos:
             eq_fold, eq_call, w_fold, w_call, w_raise = \
@@ -915,7 +915,7 @@ class AnalysisReplayer(object):
             logging.debug("_one_player_one_showdown for order=%r, "
                           "userid=%r, passive_range=%r, ranges=%r",
                           order, userid, passive_range, ranges)
-        other_ranges = {k: v for k, v in list(ranges.items()) if k != userid}
+        other_ranges = {k: v for k, v in ranges.items() if k != userid}
         combos = HandRange(passive_range).generate_options(board)
         for combo in combos:
             eq = self._one_combo_one_showdown(
@@ -1196,7 +1196,7 @@ class AnalysisReplayer(object):
         # call here with 23% equity when really I had 32% equity and it was a
         # great call!" Well no actually, the card removal effects of the folded
         # players change your equity, and you suck at poker.
-        range_map = {k: v for k, v in list(ranges.items()) if k in userids}
+        range_map = {k: v for k, v in ranges.items() if k in userids}
         assert self.board == self.game.board
         equity_map, iterations = showdown_equity(range_map, self.game.board)
         logging.debug('gameid %d, order %d, is_passive %r, factor %0.8f, '
@@ -1269,7 +1269,7 @@ class AnalysisReplayer(object):
             pot=self.pot,
             call_cost=call_cost,
             board=self.board,
-            ranges={k: v for k, v in list(self.ranges.items())
+            ranges={k: v for k, v in self.ranges.items()
                     if k in self.remaining_userids},
             has_fold=has_fold,
             has_call=has_call
@@ -1281,7 +1281,7 @@ class AnalysisReplayer(object):
             # this player folds, but the pot is contested, so we have a showdown
             order += 1
             ranges = {key: HandRange(txt)
-                      for key, txt in list(self.ranges.items())}
+                      for key, txt in self.ranges.items()}
             # They (temporarily) fold
             ranges.pop(item.userid)
             self.analyse_showdown(ranges=ranges,
@@ -1291,7 +1291,7 @@ class AnalysisReplayer(object):
                          if userid != item.userid])
 
         ranges = {key: HandRange(txt)
-                  for key, txt in list(self.ranges.items())}
+                  for key, txt in self.ranges.items()}
         # They (temporarily) call
         ranges[item.userid] = HandRange(item.passive_range)
         if has_call:
@@ -1371,7 +1371,7 @@ class AnalysisReplayer(object):
                 .filter(PaymentToPlayer.gameid == self.game.gameid)  \
                 .filter(PaymentToPlayer.userid == rgp.userid).all()
             for scheme, include in  \
-                    list(RunningGameParticipantResult.SCHEME_DETAILS.items()):  # @UndefinedVariable
+                    RunningGameParticipantResult.SCHEME_DETAILS.items():  # @UndefinedVariable
                 rgpr = RunningGameParticipantResult()
                 rgpr.gameid = rgp.gameid
                 rgpr.userid = rgp.userid
@@ -1383,57 +1383,48 @@ class AnalysisReplayer(object):
                     rgpr.gameid, rgpr.userid, rgpr.scheme, rgpr.result)
 
     def finalise_combo_evs(self):
-        """ Write combo EVs to UserComboGameEV and UserComboOrderEV """
+        """ Write combo EVs to UserComboGameEV andUserComboOrderEV """
         if self.debug_combo:
             logging.debug("Debugging combo: %r", self.debug_combo)
-        try:
-            for _userid, user_evs in list(self.combo_orders.items()):
-                for _combo, accumulators in list(user_evs.items()):
-                    for acc in accumulators:
-                        logging.debug("Processing acc: userid=%s, order=%s, combo=%s, ev=%s", 
-                                    acc.userid, acc.order, acc.combo, acc.ev)
-                        if acc.factor != 0.0:
-                            continue
-                        
-                        try:
-                            if acc.order is None:
-                                # Create game EV record
-                                gev = UserComboGameEV()
-                                gev.gameid = self.game.gameid
-                                gev.userid = acc.userid
-                                gev.combo = _combo_to_mnemonic(acc.combo)
-                                gev.ev = acc.ev
-                                self.session.add(gev)
-                            else:
-                                # Create order EV record - set all values before adding to session
-                                oev = UserComboOrderEV()
-                                oev.gameid = self.game.gameid
-                                oev.userid = acc.userid
-                                oev.order = acc.order
-                                oev.combo = _combo_to_mnemonic(acc.combo)
-                                oev.ev = acc.ev
-                                # Verify all required fields are set
-                                if all([oev.gameid, oev.userid, oev.order, oev.combo, oev.ev is not None]):
-                                    self.session.add(oev)
-                                else:
-                                    logging.error("Missing required fields: gameid=%s, userid=%s, order=%s, combo=%s, ev=%s",
-                                                oev.gameid, oev.userid, oev.order, oev.combo, oev.ev)
-                                    continue
-                            
-                            self.session.flush()
-                            
-                        except Exception as e:
-                            logging.error("Error creating record: %s", str(e))
-                            logging.error("Data: gameid=%s, userid=%s, order=%s, combo=%s, ev=%s",
-                                        self.game.gameid, acc.userid, acc.order, 
-                                        _combo_to_mnemonic(acc.combo), acc.ev)
-                            raise
-                            
-                self.session.commit()
-        except Exception as e:
-            logging.error("Error in finalise_combo_evs: %s", str(e))
-            self.session.rollback()
-            raise
+        for _userid, user_evs in self.combo_orders.items():
+            for _combo, accumulators in user_evs.items():
+                for acc in accumulators:
+                    if _combo == self.debug_combo:
+                        acc.log_details()
+                    if acc.factor != 0.0:
+                        # Wormhole to another game?
+                        #
+                        # Hopefully.
+                        #
+                        # Because as I write this I think that this should only
+                        # happen when the combo is not fully played out in this
+                        # game's betting line - but I believe that's probably
+                        # not the case.
+                        #
+                        # Rather than lose the info (the fact that this
+                        # happened), we will very very subtly let people know,
+                        # by not recording an EV for this combo.
+                        #
+                        # Oh, and I'm not even going to log a debug event when
+                        # this happens because it's going to happen far too many
+                        # times to have the patience for that!
+                        continue
+                    if acc.order == None:
+                        gev = UserComboGameEV()
+                        self.session.add(gev)
+                        gev.gameid = self.game.gameid
+                        gev.userid = acc.userid
+                        gev.combo = _combo_to_mnemonic(acc.combo)
+                        gev.ev = acc.ev
+                    else:
+                        oev = UserComboOrderEV()
+                        self.session.add(oev)
+                        oev.gameid = self.game.gameid
+                        oev.userid = acc.userid
+                        oev.order = acc.order
+                        oev.combo = _combo_to_mnemonic(acc.combo)
+                        oev.ev = acc.ev
+            self.session.commit()
 
     def analyse(self):
         """

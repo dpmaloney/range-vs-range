@@ -364,28 +364,28 @@ showdown_view = function(criterion) {
         <td>Non-showdown winnings</td>
         {% for i in range(num_players) %}
         {% set rgp = game_details.rgp_details[i] %}
-        <td>{% if not rgp.results or not rgp.results.has_key('nsd') %}(not yet calculated){% else %}{{"%0.4f" % rgp.results['nsd']}}{% endif %}</td>
+        <td>{% if not rgp.results or 'nsd' not in rgp.results %}(not yet calculated){% else %}{{"%0.4f" % rgp.results['nsd']}}{% endif %}</td>
         {% endfor %}
     </tr>
     <tr>
         <td>Showdown winnings</td>
         {% for i in range(num_players) %}
         {% set rgp = game_details.rgp_details[i] %}
-        <td>{% if not rgp.results or not rgp.results.has_key('sd') %}(not yet calculated){% else %}{{"%0.4f" % rgp.results['sd']}}{% endif %}</td>
+        <td>{% if not rgp.results or 'sd' not in rgp.results %}(not yet calculated){% else %}{{"%0.4f" % rgp.results['sd']}}{% endif %}</td>
         {% endfor %}
     </tr>
     <tr>
         <td><strong>Total</strong></td>
         {% for i in range(num_players) %}
         {% set rgp = game_details.rgp_details[i] %}
-        <td><strong>{% if not rgp.results or not rgp.results.has_key('ev') %}(not yet calculated){% else %}{{"%0.4f" % rgp.results['ev']}}{% endif %}</strong></td>
+        <td><strong>{% if not rgp.results or 'ev' not in rgp.results %}(not yet calculated){% else %}{{"%0.4f" % rgp.results['ev']}}{% endif %}</strong></td>
         {% endfor %}
     </tr>
     <tr id='final-results'>
         <td/>
         {% for i in range(num_players) %}
         {% set rgp = game_details.rgp_details[i] %}
-        <td><strong>{% if not rgp.results or not rgp.results.has_key('ev') %}(not yet calculated){% else %}
+        <td><strong>{% if not rgp.results or 'ev' not in rgp.results %}(not yet calculated){% else %}
           <button class="btn btn-primary" type=button id="view-combos-results-{{rgp.user.userid}}" onclick="combo_view('current-viewer-row', 'view-combos-results-{{rgp.user.userid}}', 'final-results', '{{url_for('view_ev', gameid=game_details.gameid, user=rgp.user.screenname)}}');">Combos</button>
           <!--a class="btn btn-primary" href="{{url_for('view_ev', gameid=game_details.gameid, user=rgp.user.screenname)}}">Combos</a-->
         {% endif %}</strong></td>

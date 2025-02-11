@@ -88,9 +88,9 @@ def _simulate_showdown(wins_by_player, options_by_player, board, memo):
     # TODO: REVISIT: this duplicates functionality from deal_from_ranges()
     count = 0
     while True:
-        for player, options in list(options_by_player.items()):
+        for player, options in options_by_player.items():
             selected[player] = random.choice(options)
-        fixed = {player: hand for player, hand in list(selected.items())}
+        fixed = {player: hand for player, hand in selected.items()}
         if not _impossible_deal(list(fixed.values()) + [board]):
             break
         count += 1
@@ -138,7 +138,7 @@ def showdown_equity(ranges, board, hard_limit=MAX_ITERATIONS):
     returns a dict mapping player to equity (between 0.0 and 1.0)
     """
     options_by_player = {player: range_.generate_options(board)
-                         for player, range_ in list(ranges.items())}
+                         for player, range_ in ranges.items()}
     total_combos = reduce(operator.mul,
                           [len(o) for o in list(options_by_player.values())])
     if total_combos <= hard_limit and len(board) == 5:
@@ -155,7 +155,7 @@ def showdown_equity(ranges, board, hard_limit=MAX_ITERATIONS):
     if total == 0.0:  # impossible ranges, e.g. 6h6d vs Ah6h
         return {}, 0
     return {player: old_div(wins, total)
-            for player, wins in list(wins_by_player.items())}, iterations
+            for player, wins in wins_by_player.items()}, iterations
 
 def showdown(board, players_cards, memo=None):
     """
@@ -172,10 +172,10 @@ def showdown(board, players_cards, memo=None):
     shown_down = []  # list of: (player, hand or None)
     best = None  # best hand shown down so far
     total_cards = board + concatenate(
-        [c for _p, c in list(players_cards.items())])
+        [c for _p, c in players_cards.items()])
     assert len(set(total_cards)) == len(total_cards)
     assert len(board) == 5
-    for player, cards_ in list(players_cards.items()):
+    for player, cards_ in players_cards.items():
         all_cards = frozenset(board + list(cards_))
         if memo is None:
             hand = BestHandEval7(all_cards)
@@ -185,15 +185,12 @@ def showdown(board, players_cards, memo=None):
             hand = BestHandEval7(all_cards)
             memo[all_cards] = hand
         # They fold if it's worse than best, otherwise they show
-        #print(f"best: {best}")
-        #print(f"hand: {hand}")
-        if best is None or (hand is not None and hand >= best):
+        if best is None or hand >= best:
             best = hand
             shown_down.append((player, hand))
         else:
             shown_down.append((player, None))
-
-    winners = [player for player, hand in shown_down if (hand == best and hand is not None)]
+    winners = [player for player, hand in shown_down if hand == best]
     return shown_down, winners
 
 # TODO: 1: This is a hack. Combine into AnalysisReplayer, store in database.
@@ -224,7 +221,7 @@ def all_combos_ev(board, userids, pot, all_ranges):
             # combos and 5 board cards)
             # screw it let's make it an even 1,000 for those other spots
             equities = py_all_hands_vs_range(hero, villain, board, 1000)
-            for combo, eq in list(equities.items()):
+            for combo, eq in equities.items():
                 desc = unweighted_options_to_description([combo])
                 all_combos_ev.append((desc, eq * pot))
         else:
@@ -387,7 +384,7 @@ class Test(unittest.TestCase):
         delta_by_player = {"Player %d" % i: delta[i]
                            for i in range(len(expect))}
         options_by_player = {p: r.generate_options(board)
-                             for p, r in list(ranges.items())}
+                             for p, r in ranges.items()}
         wins_by_player, _ = _estimate_showdown_equity(options_by_player,
                                                    board, iterations)
         print("\nwins_by_player: %r\n" % wins_by_player)
@@ -407,7 +404,7 @@ class Test(unittest.TestCase):
         delta_by_player = {"Player %d" % i: sds * sdev[i] * (iterations ** 0.5)
                            for i in range(len(expect))}
         options_by_player = {p: r.generate_options(board)
-                             for p, r in list(ranges.items())}
+                             for p, r in ranges.items()}
         wins_by_player, _ = _estimate_showdown_equity(options_by_player,
                                                    board, iterations)
         print("\nwins_by_player: %r\n" % wins_by_player)

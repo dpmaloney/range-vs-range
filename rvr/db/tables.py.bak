@@ -1,9 +1,6 @@
 """
 Declares database tables
 """
-from __future__ import division
-from builtins import object
-from past.utils import old_div
 from sqlalchemy import Column, Integer, String, Boolean, Sequence, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from rvr.db.creation import BASE
@@ -175,7 +172,7 @@ class UserSituationPlayer(BASE, object):
         if self.amount_won is None or self.hands_played is None:
             return None
         else:
-            return old_div(1.0 * self.amount_won, self.hands_played)
+            return 1.0 * self.amount_won / self.hands_played
     ev = property(get_ev)
 
 class OpenGame(BASE):
@@ -850,10 +847,10 @@ class SituationComboEV(BASE):
 
 class UserComboOrderEV(BASE):
     __tablename__ = "user_combo_order_ev"
-    userid = Column(Integer, ForeignKey("user.userid"), primary_key=True, nullable=False)
+    userid = Column(Integer, ForeignKey("user.userid"), primary_key=True)
     gameid = Column(Integer, ForeignKey("running_game.gameid"),
                     primary_key=True)
-    order = Column(Integer, primary_key=True, nullable=False)
+    order = Column(Integer, primary_key=True)
     combo = Column(String(4), primary_key=True)
     ev = Column(Float, nullable=False)
     user = relationship("User")

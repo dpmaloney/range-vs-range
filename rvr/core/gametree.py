@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import zip
+from builtins import object
+from past.utils import old_div
 from rvr.poker.cards import Card, RIVER
 from rvr.poker.handrange import HandRange, unweighted_options_to_description,\
     remove_board_from_range, NOTHING
@@ -29,7 +33,7 @@ class GameTreeNode(object):
         self.parent = parent  # GameTreeNode
         self.children = []  # list of GameTreeNode
         self.ranges_by_userid = {k: HandRange(v)
-                                 for k, v in ranges_by_userid.items()}
+                                 for k, v in list(ranges_by_userid.items())}
         # total chips put in
         self.total_contrib = dict(total_contrib)
         self.winners = set(winners) if winners else None  # set of userid
@@ -118,12 +122,12 @@ class GameTreeNode(object):
                     .generate_options(Card.many_from_text(child.board) +
                                       list(combo))
                     for child in valid_children}
-                total = len(concatenate(buckets.values()))
+                total = len(concatenate(list(buckets.values())))
                 if total == 0:
                     raise InvalidComboForTree('Combo not in child ranges for'
                         ' userid %d at betting line %s. ' % (userid,
                         line_description(self.betting_line)))
-                probabilities = {child: 1.0 * len(buckets[child]) / total
+                probabilities = {child: old_div(1.0 * len(buckets[child]), total)
                                  for child in valid_children}
                 ev = sum(probabilities[child] * child.combo_ev(combo, userid)
                     for child in valid_children)
@@ -138,7 +142,7 @@ class GameTreeNode(object):
         else:
             # showdown
             ranges = {userid: range_
-                      for userid, range_ in self.ranges_by_userid.items()}
+                      for userid, range_ in list(self.ranges_by_userid.items())}
             combos = set([combo])
             description = unweighted_options_to_description(combos)
             ranges[userid] = HandRange(description)
@@ -154,7 +158,7 @@ class GameTreeNode(object):
         pre-calculated.
         """
         key = (combo, userid)
-        if not self.combo_evs.has_key(key):
+        if key not in self.combo_evs:
             self.combo_evs[key] = self.calculate_combo_ev(combo, userid)
         if local:
             # To their true EV for the whole game at this point, add back their
@@ -185,7 +189,7 @@ class GameTreeNode(object):
                 # create a new one, a copy of template, without children yet
                 # (because this line is in the other, but not in this)
                 descriptions = {k: v.description
-                    for k, v in template.ranges_by_userid.items()}
+                    for k, v in list(template.ranges_by_userid.items())}
                 child = cls(template.street, template.board,
                             template.actor, template.action, node,
                             descriptions, template.total_contrib,
@@ -252,7 +256,7 @@ class GameTreeNode(object):
                 to_act = set(remain)
                 contrib = {rgp.userid: 0 for rgp in game.rgps}
                 raise_total = 0
-                for userid, old_range in actual_ranges.iteritems():
+                for userid, old_range in list(actual_ranges.items()):
                     new_range = remove_board_from_range(HandRange(old_range),
                         Card.many_from_text(item.cards))
                     actual_ranges[userid] = new_range.description

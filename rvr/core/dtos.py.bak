@@ -9,8 +9,6 @@ Data transfer objects:
   situation as per open game list
 - hand history(!)
 """
-from builtins import str
-from builtins import object
 from rvr.db import tables
 from argparse import ArgumentError
 from rvr.poker.handrange import HandRange

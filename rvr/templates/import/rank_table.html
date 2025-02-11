@@ -1,9 +1,111 @@
 {% macro formatted_rank_table(rank_table, tooltips) %}
-  <table>
+  <style>
+    /* Visual styles for selected buttons */
+    .rank-button.selected {
+      background-color: #337ab7;
+      color: white;
+      border-color: #2e6da4;
+    }
+    
+    /* Prevent text selection during drag */
+    .rank-selection-table {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+
+  <table class="rank-selection-table">
    {% for row in rank_table %}<tr>
     {% for details in row %}
     <td>{% if details.class != "r_hdn" %}<div {% if tooltips %}data-toggle="tooltip" {% endif %}{% if details.topthree %}data-placement='bottom' {% endif %}title="{{details.hover}}"><button type=button id="{{details.id}}" class="{{details.class}} rank-button btn btn-xs" onclick="rank_click(event, '{{details.id}}');">{{details.text}}</button></div><input type=hidden class="r_h" id="sel_{{details.id}}" name="sel_{{details.id}}" value="false">{% else %}<button type=button id="{{details.id}}" class="{{details.class}} rank-button btn btn-xs invisible" disabled=disabled>&nbsp;</button>{% endif %}</td>
     {% endfor %}
    </tr>{% endfor %}
   </table>
+
+  <script>
+    (function() {
+        let isDragging = false;
+        let startButton = null;
+        let startState = null;
+        const table = document.querySelector('.rank-selection-table');
+
+        // Prevent default drag behavior
+        table.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+        });
+
+        // Mouse down - start dragging
+        table.addEventListener('mousedown', function(e) {
+            const button = e.target.closest('button');
+            if (!button || button.disabled) return;
+            
+            isDragging = true;
+            startButton = button;
+            startState = !button.classList.contains('selected'); // Toggle state
+            
+            // Apply initial selection
+            toggleSelection(button, startState);
+            
+            e.preventDefault(); // Prevent text selection
+        });
+
+        // Mouse move - handle dragging
+        table.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            
+            const button = e.target.closest('button');
+            if (!button || button.disabled) return;
+            
+            toggleSelection(button, startState);
+        });
+
+        // Mouse up - stop dragging
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            startButton = null;
+        });
+
+        // Mouse leave - stop dragging if mouse leaves table
+        table.addEventListener('mouseleave', function() {
+            isDragging = false;
+            startButton = null;
+        });
+
+        function toggleSelection(button, state) {
+            if (state) {
+                button.classList.add('selected');
+                button.classList.add('btn-primary');  // Bootstrap primary button style
+                button.classList.remove('btn-default');
+                document.getElementById('sel_' + button.id).value = 'true';
+            } else {
+                button.classList.remove('selected');
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-default');  // Bootstrap default button style
+                document.getElementById('sel_' + button.id).value = 'false';
+            }
+        }
+
+        // Override the existing rank_click function
+        window.rank_click = function(event, id) {
+            if (isDragging) {
+                event.preventDefault();
+                return;
+            }
+            
+            const button = document.getElementById(id);
+            const state = !button.classList.contains('selected');
+            toggleSelection(button, state);
+        };
+
+        // Initialize buttons based on their hidden input values
+        document.querySelectorAll('.rank-button').forEach(button => {
+            const hiddenInput = document.getElementById('sel_' + button.id);
+            if (hiddenInput && hiddenInput.value === 'true') {
+                toggleSelection(button, true);
+            }
+        });
+    })();
+  </script>
 {% endmacro %}

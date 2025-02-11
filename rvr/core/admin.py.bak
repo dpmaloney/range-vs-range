@@ -2,7 +2,6 @@
 Admin Cmd class for interacting with API
 """
 from __future__ import print_function
-from builtins import map
 from cmd import Cmd
 from rvr.core.api import APIError, API
 from rvr.core.dtos import LoginRequest, ChangeScreennameRequest,\
@@ -28,7 +27,7 @@ def display_game_tree(tree, local=False):
         display_game_tree(node, local)
     for userid in tree.ranges_by_userid:
         ev_map = {}
-        for combo, equity in list(tree.all_combos_ev(userid, local).items()):
+        for combo, equity in tree.all_combos_ev(userid, local).items():
             lower_card, higher_card = sorted(combo)
             desc = higher_card.to_mnemonic() + lower_card.to_mnemonic()
             ev_map[desc] = "%0.04f" % (equity,)
@@ -491,7 +490,7 @@ class AdminCmd(Cmd):
         if len(params) not in [2, 3]:
             print("Bad syntax. See 'help merge'.")
             return
-        gameids = list(map(int, params))
+        gameids = map(int, params)
         result = self.api.merge_games(gameids)
         if isinstance(result, APIError):
             print("Error:", result.description)

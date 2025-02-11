@@ -1,7 +1,6 @@
 """
 Unit tests for eval7
 """
-from builtins import range
 import unittest
 from rvr.poker.handrange import HandRange
 from rvr.poker.cards import Card
@@ -52,7 +51,7 @@ class TestEval7(unittest.TestCase):
     def test_wh_random(self):
         # 0.9s
         result = {n: 0 for n in range(52)}
-        for i in range(1900000):
+        for i in xrange(1900000):
             result[py_wh_randint(52)] += 1
         for i in range(52):
             self.assertAlmostEqual(result[i], 36500, delta=1000)

@@ -1,10 +1,6 @@
 """
 The main pages for the site
 """
-from __future__ import division
-from builtins import str
-from builtins import range
-from past.utils import old_div
 from flask import render_template, redirect, url_for
 from rvr.app import APP
 from rvr.forms.change import ChangeForm
@@ -62,7 +58,7 @@ def auth_check(view_func):
         @wraps(view_func)
         def decorated(*args, **kwargs):
             if 'userid' not in session and 'screenname' not in session:
-                response = OIDC.redirect_to_auth_server()
+                response = OIDC.authenticate_or_redirect()
                 if response is not None:
                     return response
             return view_func(*args, **kwargs)
@@ -75,10 +71,9 @@ def is_authenticated_oidc():
     if 'userid' in session and 'screenname' in session:
         return True  # I don't care if Google's OIDC token expires
     
-    if session.get("oidc_auth_token") is None:
-    # Otherwise OIDC gets a little confused
-        return False
-    
+    # if request.cookies.get(OIDC.c, None) is None:
+    #     # Otherwise OIDC gets a little confused
+    #     return False
     else:
         return OIDC.redirect_to_auth_server() is None
 
@@ -191,7 +186,7 @@ def backdoor_page():
     is_enabled = local_settings.ALLOW_BACKDOOR
     # Also show the values of these on the page.
     form = BackdoorForm()
-    success = form.validate_on_submit()
+    success = form.validate()
     if success:
         backdoor_sub = form.backdoor_sub.data
         backdoor_email = form.backdoor_email.data
@@ -275,7 +270,7 @@ def logout():
     session.pop('userid', None)
     session.pop('screenname', None)
     response = redirect(url_for('home_page'))
-    response.set_cookie("oidc_auth_token", expires=0)
+    response.set_cookie(OIDC.id_token_cookie_name, expires=0)
     return response
 
 @APP.route('/login', methods=['GET'])
@@ -646,9 +641,9 @@ def _range_action_to_vars(item):
     total = len(all_options)
     # NOTE: some of this is necessarily common with ACTION_SUMMARY
     return {"screenname": item.user.screenname,
-            "fold_pct": old_div(100.0 * fold_total, total),
-            "passive_pct": old_div(100.0 * passive_total, total),
-            "aggressive_pct": old_div(100.0 * aggressive_total, total),
+            "fold_pct": 100.0 * fold_total / total,
+            "passive_pct": 100.0 * passive_total / total,
+            "aggressive_pct": 100.0 * aggressive_total / total,
             "raise_total": item.range_action.raise_total,
             "is_check": item.is_check,
             "is_raise": item.is_raise,
@@ -677,7 +672,7 @@ def _action_summary_to_vars(range_action, action_result, action_result_order,
     return {"screenname": user_range.user.screenname,
             "action_result": action_result.action_result,
             "action_result_order": action_result_order,
-            "percent": old_div(100.0 * new_total, len(SET_ANYTHING_OPTIONS)),
+            "percent": 100.0 * new_total / len(SET_ANYTHING_OPTIONS),
             "combos": new_total,
             "is_check": range_action.is_check,
             "is_raise": range_action.is_raise,

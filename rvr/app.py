@@ -3,7 +3,7 @@ Defines the Flask container, 'APP'
 """
 # pylint:disable=no-name-in-module
 from flask import Flask
-from werkzeug import SharedDataMiddleware  #IGNORE:E0611 @UnresolvedImport
+from werkzeug.middleware.shared_data import SharedDataMiddleware
 import os
 from flask_mail import Mail
 from flask.helpers import url_for

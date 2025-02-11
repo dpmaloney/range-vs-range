@@ -15,7 +15,6 @@ from rvr.core.dtos import ActionOptions, ActionDetails, ActionResult
 from collections import namedtuple
 import logging
 import numpy
-from itertools import zip_longest
 
 NEXT_ROUND = {PREFLOP: FLOP, FLOP: TURN, TURN: RIVER}
 TOTAL_COMMUNITY_CARDS = {PREFLOP: 0, FLOP: 3, TURN: 4, RIVER: 5}
@@ -28,27 +27,8 @@ def _option_to_text(option):
     """
     return "".join([o.to_mnemonic() for o in sorted(option, reverse=True)])
 
-def _cmp_to_key(mycmp):
-    """Convert a cmp= function into a key= function"""
-    class K(object):
-        __slots__ = ['obj']
-        def __init__(self, obj, *args):
-            self.obj = obj
-        def __lt__(self, other):
-            return mycmp(self.obj, other.obj) < 0
-        def __gt__(self, other):
-            return mycmp(self.obj, other.obj) > 0
-        def __eq__(self, other):
-            return mycmp(self.obj, other.obj) == 0
-        def __le__(self, other):
-            return mycmp(self.obj, other.obj) <= 0
-        def __ge__(self, other):
-            return mycmp(self.obj, other.obj) >= 0
-        def __ne__(self, other):
-            return mycmp(self.obj, other.obj) != 0
-    return K
-
-def range_sum_equal(fold_range, passive_range, aggressive_range, original_range):
+def range_sum_equal(fold_range, passive_range, aggressive_range,
+                    original_range):
     """
     Returns validity (boolean), and reason (string, or None if valid)
     """
@@ -57,10 +37,11 @@ def range_sum_equal(fold_range, passive_range, aggressive_range, original_range)
     original_hand_options = original_range.generate_options()
     all_ranges_hand_options = concatenate([r.generate_options()
                                            for r in all_ranges])
-    original_hand_options.sort(key=_cmp_to_key(_cmp_options))
-    all_ranges_hand_options.sort(key=_cmp_to_key(_cmp_options))
+    original_hand_options.sort(cmp=_cmp_options)
+    all_ranges_hand_options.sort(cmp=_cmp_options)
     prev = None
-    for ori, new in zip_longest(original_hand_options, all_ranges_hand_options):
+    # pylint:disable=W0141
+    for ori, new in map(None, original_hand_options, all_ranges_hand_options):
         # we compare two hands, each of which is a set of two Card
         if ori != new:
             # actually three scenarios:
@@ -170,7 +151,7 @@ def generate_excluded_cards(game, exclude=None):
     board = game.total_board or game.board
     player_to_dealt = deal_from_ranges(map_to_range, board)
     # note: this catches cards dealt to folded RGPs - as it should!
-    values = [dealt for rgp, dealt in list(player_to_dealt.items())
+    values = [dealt for rgp, dealt in player_to_dealt.items()
               if rgp != exclude]
     excluded_cards = concatenate(values)
     excluded_cards.extend(board)

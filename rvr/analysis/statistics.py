@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 from rvr.db import tables
 from rvr.local_settings import SUPPRESSED_GAME_MAX, SUPPRESSED_SITUATIONS
 import numpy
@@ -61,14 +63,14 @@ def _get_all_results(groups, order, userid, scheme):
     Return user's results for scheme
     """
     results = {}
-    for spawn_group, games in groups.iteritems():
+    for spawn_group, games in list(groups.items()):
         for game in games:
             ev = _get_ev(game=game, order=order,
                          userid=userid, scheme=scheme)
             if ev is not None:  # they did play this position
                 results.setdefault(spawn_group, 0.0)
                 results[spawn_group] += ev * game.spawn_factor
-    return filter(lambda x: x is not None, results.values())
+    return [x for x in list(results.values()) if x is not None]
 
 def _game_timed_out(session, game):
     """
@@ -104,7 +106,7 @@ def get_user_statistics(session, userid, min_hands, is_competition):
         groups = {}
         for game in games:
             groups.setdefault(game.spawn_group, []).append(game)
-        for spawn_group in groups.keys():
+        for spawn_group in list(groups.keys()):
             if any(not g.game_finished or _game_timed_out(session, g)
                    for g in groups[spawn_group]):
                 groups.pop(spawn_group)
@@ -135,10 +137,10 @@ def get_user_statistics(session, userid, min_hands, is_competition):
                 total=total if data else None,
                 redline=redline if redline_data else None,
                 blueline=blueline if blueline_data else None,
-                average=total / len(data) if data else None,
+                average=old_div(total, len(data)) if data else None,
                 confidence=confidence))
             if data and orbit_average is not None:
-                orbit_average += total / len(data)
+                orbit_average += old_div(total, len(data))
                 orbit_average -= player.contributed
             else:
                 orbit_average = None
@@ -181,7 +183,7 @@ def recalculate_global_statistics(session):
                 if result.scheme == 'ev':
                     results.append(result.result)
         if results:
-            position.average_result = sum(results) / len(results)
+            position.average_result = old_div(sum(results), len(results))
             position.stddev = numpy.std(results)  # pylint:disable=no-member
         else:
             position.average_result = None

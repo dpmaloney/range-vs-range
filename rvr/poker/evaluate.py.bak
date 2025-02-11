@@ -1,16 +1,13 @@
 """
 Python wrapper for (cython) eval7
 """
-from past.builtins import cmp
-from builtins import str
-from builtins import object
 from rvr.poker.cards import Card
 import unittest
 from rvr.compiled import eval7
 import operator
 #pylint:disable=R0903,R0904
 
-class BestHandEval7(object):
+class BestHandEval7:
     """
     Wrapping class for eval7
     """
@@ -21,28 +18,6 @@ class BestHandEval7(object):
             return 1  # anything beats a fold
         # higher value is higher hand
         return cmp(self.value, other.value)
-    
-    def __eq__(self, other):
-        if other is None:
-            return False
-
-        return self.value == other.value
-    
-    def __ne__(self, other):
-        return self.value != other.value
-    
-    def __gt__(self, other):
-        return self.value > other.value
-    
-    def __ge__(self, other):
-        return self.value >= other.value
-    
-    def __lt__(self, other):
-        return self.value < other.value
-    
-    def __le__(self, other):
-        return self.value <= other.value    
-
     def __hash__(self):
         return hash(self.value)
     def __str__(self):

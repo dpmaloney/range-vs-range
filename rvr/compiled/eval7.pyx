@@ -24,8 +24,8 @@ cdef void wh_init(cython.ulong seed):
     global _wh_seed_x, _wh_seed_y, _wh_seed_z
     # arbitrarily, statically chosen for this eval7 version.
     cdef cython.ulong a = seed
-    _wh_seed_x = a % 30268; a = a / 30268
-    _wh_seed_y = a % 30306; a = a / 30306
+    _wh_seed_x = a % 30268; a = a // 30268
+    _wh_seed_y = a % 30306; a = a // 30306
     _wh_seed_z = a % 30322
 
 cdef cython.double wh_random():

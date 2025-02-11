@@ -4,7 +4,7 @@ User submits a range-based action
 from wtforms.fields.simple import HiddenField
 from wtforms.validators import Length, Regexp
 from rvr.poker.handrange import NOTHING
-from flask_wtf.form import Form
+from flask_wtf import FlaskForm
 
 def action_form(is_check, is_raise, can_raise, min_raise, max_raise):
     """
@@ -15,7 +15,7 @@ def action_form(is_check, is_raise, can_raise, min_raise, max_raise):
     total_label = "Raise total:" if is_raise else "Bet total:"
     min_raise = min_raise if min_raise is not None else 0
     max_raise = max_raise if max_raise is not None else 0
-    class ActionForm(Form):  # pylint:disable=R0924,R0903
+    class ActionForm(FlaskForm):  # pylint:disable=R0924,R0903
         """
         User submits a range-based action
         """

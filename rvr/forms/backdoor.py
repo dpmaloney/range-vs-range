@@ -1,15 +1,16 @@
 """
 Form for backdoor authentication page
 """
-from wtforms.fields.simple import TextField
+from wtforms.fields.simple import StringField
 from wtforms.validators import Length
-from flask_wtf.form import Form
+from flask_wtf import FlaskForm
 
-class BackdoorForm(Form):  # pylint:disable=R0903
+
+class BackdoorForm(FlaskForm):  # pylint:disable=R0903
     """
     User declares OIDC subject identifier and email
     """
-    backdoor_sub = TextField(label="backdoor_sub",
+    backdoor_sub = StringField(label="backdoor_sub",
                              validators=[Length(min=1)])
-    backdoor_email = TextField(label="backdoor_email",
+    backdoor_email = StringField(label="backdoor_email",
                                validators=[Length(min=1)])

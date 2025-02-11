@@ -1,17 +1,13 @@
 """
 Helpful functions to be called by JavaScript
 """
-from __future__ import division
 
-from future import standard_library
-standard_library.install_aliases()
-from past.utils import old_div
 import urllib.request
 from rvr.app import APP
 from flask import jsonify
 from rvr.poker.handrange import NOTHING, ANYTHING
 import json
-import urllib.request, urllib.parse, urllib.error
+import urllib
 from rvr.views.range_editor import safe_hand_range, safe_board
 import logging
 
@@ -53,7 +49,7 @@ def range_subtract():
     original_size = len(original.generate_options(board))
     result_size = len(result.generate_options(board))
     return jsonify(difference=result.description,
-                   size=old_div(1.0 * result_size, original_size))
+                   size=1.0 * result_size / original_size)
 
 @APP.route('/ajax/total_donated')
 def total_donated():
