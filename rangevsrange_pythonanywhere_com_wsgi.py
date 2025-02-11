@@ -13,7 +13,7 @@
 import sys
 
 # explicitly set range-vs-range package path
-path = '/home/rangevsrange/range-vs-range/'
+path = '/home/MrMonacle/range-vs-range/'
 if path not in sys.path:
     sys.path.append(path)
 

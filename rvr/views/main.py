@@ -72,10 +72,11 @@ def is_authenticated_oidc():
     """
     Is the user authenticated with OpenID Connect?
     """
+    print(session)
     if 'userid' in session and 'screenname' in session:
         return True  # I don't care if Google's OIDC token expires
     
-    if session.get("oidc_auth_token") is None:
+    if OIDC.get_access_token() is None:
     # Otherwise OIDC gets a little confused
         return False
     
