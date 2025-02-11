@@ -74,17 +74,21 @@ def is_authenticated_oidc():
     """
     #print("GET session")
     #print(" ")
-    #print(session)
-    #print(OIDC.get_access_token())
-    if 'userid' in session and 'screenname' in session:
-        return True  # I don't care if Google's OIDC token expires
     
-    if OIDC.get_access_token() is None:
+    #print(OIDC.get_access_token())
+    #print("checking oidc")
+    if session.get("oidc_auth_token") is None:
     # Otherwise OIDC gets a little confused
         return False
     
+    if 'userid' in session and 'screenname' in session:
+        #print('gopod')
+        return True  # I don't care if Google's OIDC token expires
+    
+    
+    
     else:
-        return OIDC.redirect_to_auth_server() is None
+        return session.get("oidc_auth_token") is not None
 
 def is_authenticated():
     """
@@ -121,7 +125,7 @@ def get_oidc_token_details():
     Returns (subject identifier, subject email)
     """
     try:
-        return session.get('sub'), session.get('email')
+        return session.get('oidc_auth_profile').get('sub'), session.get('oidc_auth_profile').get('email')
     except (TypeError, AttributeError):
         if local_settings.ALLOW_BACKDOOR:
             return get_backdoor_details()
@@ -278,10 +282,15 @@ def logout():
     """
     Explicit logout
     """
-    session.pop('userid', None)
+    
     session.pop('screenname', None)
+    session.pop('userid', None)
+    
+
     response = redirect(url_for('home_page'))
-    OIDC.logout()
+
+    
+    
     return response
 
 @APP.route('/login', methods=['GET'])
