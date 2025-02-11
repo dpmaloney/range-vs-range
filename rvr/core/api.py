@@ -38,6 +38,31 @@ from rvr.analysis.statistics import recalculate_global_statistics
 from sqlalchemy.orm.session import sessionmaker
 from rvr.core.gametree import GameTreeNode, GameTree
 
+from rvr.core.situations.blind_vs_blind import create_situation as create_blind_vs_blind
+from rvr.core.situations.btn_open import create_situation as create_btn_open
+from rvr.core.situations.co_vs_sb_3b import create_situation as create_co_vs_sb_3b
+from rvr.core.situations.dry_short import create_situation as create_dry_short
+from rvr.core.situations.dry import create_situation as create_dry
+from rvr.core.situations.ep_open import create_situation as create_ep_open
+from rvr.core.situations.flop_3b_ip import create_situation as create_flop_3b_ip
+from rvr.core.situations.flop_3b_oop import create_situation as create_flop_3b_oop
+from rvr.core.situations.flop_765r_short import create_situation as create_flop_765r_short
+from rvr.core.situations.flop_Q95r_short import create_situation as create_flop_Q95r_short
+from rvr.core.situations.flop_rainbow_short import create_situation as create_flop_rainbow_short
+from rvr.core.situations.flop_srp_ip_hj import create_situation as create_flop_srp_ip_hj
+from rvr.core.situations.flop_srp_ip import create_situation as create_flop_srp_ip
+from rvr.core.situations.flop_srp_oop_dry import create_situation as create_flop_srp_oop_dry
+from rvr.core.situations.flop_srp_oop import create_situation as create_flop_srp_oop
+from rvr.core.situations.hu_deep import create_situation as create_hu_deep
+from rvr.core.situations.hu_flop_rainbow import create_situation as create_hu_flop_rainbow
+from rvr.core.situations.hu_rainbow_donk import create_situation as create_hu_rainbow_donk
+from rvr.core.situations.test_3_handed import create_situation as create_test_3_handed
+from rvr.core.situations.test_4_handed import create_situation as create_test_4_handed
+
+
+
+
+
 def exception_mapper(fun):
     """
     Converts database exceptions to APIError
@@ -143,6 +168,27 @@ class API(object):
         Add all situations
         """
         self._add_situation(_create_hu())
+        self._add_situation(_create_three())
+        self._add_situation(create_blind_vs_blind())
+        self._add_situation(create_btn_open())
+        self._add_situation(create_co_vs_sb_3b())
+        self._add_situation(create_dry_short())
+        self._add_situation(create_dry())
+        self._add_situation(create_ep_open())
+        self._add_situation(create_flop_3b_ip())
+        self._add_situation(create_flop_3b_oop())
+        self._add_situation(create_flop_765r_short())
+        self._add_situation(create_flop_Q95r_short())
+        self._add_situation(create_flop_rainbow_short())
+        self._add_situation(create_flop_srp_ip_hj())
+        self._add_situation(create_flop_srp_ip())
+        self._add_situation(create_flop_srp_oop_dry())
+        self._add_situation(create_flop_srp_oop())
+        self._add_situation(create_hu_deep())
+        self._add_situation(create_hu_flop_rainbow())
+        self._add_situation(create_hu_rainbow_donk())
+        self._add_situation(create_test_3_handed())
+        self._add_situation(create_test_4_handed())
 
     def _add_card_combo(self, higher_card, lower_card):
         """
