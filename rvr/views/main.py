@@ -72,9 +72,11 @@ def is_authenticated_oidc():
     """
     Is the user authenticated with OpenID Connect?
     """
-    print(session)
-    print(OIDC.get_access_token())
-    if OIDC.get_access_token() is not None:
+    #print("GET session")
+    #print(" ")
+    #print(session)
+    #print(OIDC.get_access_token())
+    if 'userid' in session and 'screenname' in session:
         return True  # I don't care if Google's OIDC token expires
     
     if OIDC.get_access_token() is None:
@@ -99,8 +101,10 @@ def is_logged_in():
     """
     Is the user logged in (i.e. they've been to the database)
     """
-    return is_authenticated() and  \
-        'userid' in session and 'screenname' in session
+    #print("GET session OIDC_AUTH_TOKEN")
+    #print(" ")
+    #print(session.get("oidc_auth_token"))
+    return is_authenticated() and 'userid' in session and 'screenname' in session
 
 def get_backdoor_details():
     """
@@ -117,7 +121,7 @@ def get_oidc_token_details():
     Returns (subject identifier, subject email)
     """
     try:
-        return g.oidc_id_token['sub'], g.oidc_id_token['email']
+        return session.get('sub'), session.get('email')
     except (TypeError, AttributeError):
         if local_settings.ALLOW_BACKDOOR:
             return get_backdoor_details()
@@ -277,7 +281,7 @@ def logout():
     session.pop('userid', None)
     session.pop('screenname', None)
     response = redirect(url_for('home_page'))
-    response.set_cookie("oidc_auth_token", expires=0)
+    OIDC.logout()
     return response
 
 @APP.route('/login', methods=['GET'])
