@@ -7,3 +7,4 @@ SECRET_KEY = 'GdKL9zT14DX2beZG5YMKSai5pigV1cgt'  # Overridden in local_settings
 DEBUG = True
 RELOADER = False
 OPENID_FS_STORE_PATH = 'openid-store'
+OIDC_CLIENT_SECRETS = 'client_secrets.json'

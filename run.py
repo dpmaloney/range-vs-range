@@ -25,7 +25,7 @@ def _main():
     api.ensure_open_games()
     # Run the app locally
     APP.run(host=APP.config.get('HOST', '0.0.0.0'),
-            port=APP.config.get('PORT', 80),
+            port=APP.config.get('PORT', 8080),
             debug=APP.config['DEBUG'],
             use_reloader=APP.config.get('RELOADER', False),
             threaded=True)  # https://stackoverflow.com/questions/17854713/error-errno-10053
